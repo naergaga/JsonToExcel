@@ -17,7 +17,7 @@ namespace JsonToExcel
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
+            //Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
         }
     }
 }
