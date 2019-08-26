@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using Newtonsoft.Json.Linq;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,6 +135,10 @@ namespace JsonToExcel
                 {
                     cell.Style.Numberformat.Format = "0.00";
                 }
+            }
+            else if (type == typeof(JObject))
+            {
+                value = value.ToString();
             }
 
             cell.Value = value;
