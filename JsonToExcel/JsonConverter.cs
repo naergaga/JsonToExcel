@@ -11,8 +11,11 @@ namespace JsonToExcel
 {
     public class JsonConverter
     {
-        private static Dictionary<string, string> headerMap1 = new Dictionary<string, string> {
+        private readonly static Dictionary<string, string> headerMap1 = new Dictionary<string, string> {
                         { "Key",Properties.Resources.Key },
+                        { "Value",Properties.Resources.Value }
+                    };
+        private readonly static Dictionary<string, string> headerMap2 = new Dictionary<string, string> {
                         { "Value",Properties.Resources.Value }
                     };
 
@@ -82,17 +85,33 @@ namespace JsonToExcel
         {
             var list = array.Children();
             var first = list.First();
-            var headerMap = first.Children().Select(t => (JProperty)t).ToDictionary(t => t.Name, t => t.Name);
-            var exportList = list.Select(t =>
+            var firstType = first.GetType();
+            Dictionary<string, string> headerMap = null;
+            IEnumerable<Dictionary<string, object>> exportList = null;
+            if (firstType == typeof(JValue))
             {
-                Dictionary<string, object> map1 = new Dictionary<string, object>();
-                foreach (var item in t.Children())
+                headerMap = headerMap2;
+                exportList = list.Select(t =>
                 {
-                    var p1 = (JProperty)item;
-                    map1.Add(p1.Name, p1.Value.ToObject<dynamic>());
-                }
-                return map1;
-            });
+                    Dictionary<string, object> map1 = new Dictionary<string, object>();
+                    map1.Add("Value", t.ToObject<dynamic>());
+                    return map1;
+                });
+            }
+            else
+            {
+                headerMap = first.Children().Select(t => (JProperty)t).ToDictionary(t => t.Name, t => t.Name);
+                exportList = list.Select(t =>
+                {
+                    Dictionary<string, object> map1 = new Dictionary<string, object>();
+                    foreach (var item in t.Children())
+                    {
+                        var p1 = (JProperty)item;
+                        map1.Add(p1.Name, p1.Value.ToObject<dynamic>());
+                    }
+                    return map1;
+                });
+            }
 
             var exportModel = new ExportModel
             {
@@ -105,7 +124,7 @@ namespace JsonToExcel
             return service.Export(exportModel);
         }
 
-       
+
 
         private JArray FindJArray(JToken jToken)
         {
